@@ -1,0 +1,53 @@
+name: "CI"
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # test against JDK 8
+        include:
+        - java: 8
+          os: macos-latest
+          arch: arm64
+          runner: macos-latest
+          expander_leg: macos-latest-8-arm64
+    name: CI with Java ${{ matrix.java }} [${{ matrix.expander_leg }}]
+    steps:
+    - uses: actions/checkout@v6
+    - name: Setup jdk
+      uses: actions/setup-java@v5
+      with:
+        java-version: ${{ matrix.java }}
+        distribution: 'zulu'
+          # Zulu ships no native JDK 8 for Windows on ARM64. Use the x64 build there;
+          # Windows 11 ARM runs it through x64 emulation, so the leg still builds and tests on windows-11-arm.
+        architecture: ${{ (matrix.os == 'windows-latest' && matrix.arch == 
+          'arm64' && matrix.java == 8) && 'x64' || matrix.arch }}
+    - uses: actions/cache@v5
+      id: gradle-cache
+      with:
+        path: ~/.gradle/caches
+        key: ${{ runner.os }}-gradle-${{ 
+          hashFiles('**/gradle/dependency-locks/*.lockfile') }}
+        restore-keys: |
+          - ${{ runner.os }}-gradle-
+    - uses: actions/cache@v5
+      id: gradle-wrapper-cache
+      with:
+        path: ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradlewrapper-${{ hashFiles('gradle/wrapper/*') }}
+        restore-keys: |
+          - ${{ runner.os }}-gradlewrapper-
+    - name: Build with Gradle
+      run: ./gradlew --info --stacktrace build
+      env:
+        CI_NAME: github_actions
+        CI_BUILD_NUMBER: ${{ github.sha }}
+        CI_BUILD_URL: 'https://github.com/${{ github.repository }}'
+        CI_BRANCH: ${{ github.ref }}
+        COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    timeout-minutes: 150
