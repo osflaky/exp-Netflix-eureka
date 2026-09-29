@@ -1,0 +1,42 @@
+configurations.all {
+    // jersey2
+    exclude group: 'org.glassfish.jersey'
+}
+
+dependencies {
+    api "com.netflix.netflix-commons:netflix-eventbus:0.3.0"
+    api 'com.thoughtworks.xstream:xstream:1.4.21'
+    api "com.netflix.archaius:archaius-core:${archaiusVersion}"
+    api 'javax.ws.rs:jsr311-api:1.1.1'
+    api "com.netflix.servo:servo-core:${servoVersion}"
+    api "com.sun.jersey:jersey-core:${jerseyVersion}"
+    api "com.sun.jersey:jersey-client:${jerseyVersion}"
+    api "com.sun.jersey.contribs:jersey-apache-client4:${jerseyVersion}"
+    api "org.apache.httpcomponents:httpclient:${apacheHttpClientVersion}"
+    api "com.google.code.findbugs:jsr305:${jsr305Version}"
+    api "commons-configuration:commons-configuration:${commonsConfigurationVersion}"
+    api "com.google.inject:guice:${guiceVersion}"
+
+    api "com.github.vlsi.compactmap:compactmap:2.0"
+
+    api "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}"
+    api "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
+    api "com.fasterxml.jackson.core:jackson-databind:${jacksonDatabindVersion}"
+
+    // Eureka client uses JSON encoding by default
+    compileOnly "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:${jacksonVersion}"
+    // Prefered jackson Stax serializer. Default Oracle has issues (adds empty namespace) and is slower
+    compileOnly "com.fasterxml.woodstox:woodstox-core:${woodstoxVersion}"
+
+    runtimeOnly "org.codehaus.jettison:jettison:${jettisonVersion}"
+
+    testImplementation project(':eureka-test-utils')
+    testImplementation "junit:junit:${junit_version}"
+    testImplementation 'org.mortbay.jetty:jetty:6.1H.22'
+    testImplementation "org.mockito:mockito-inline:${mockitoVersion}"
+    testImplementation "org.mock-server:mockserver-netty:${mockserverVersion}"
+    testImplementation "com.netflix.governator:governator:${governatorVersion}"
+    testImplementation "com.github.tomakehurst:wiremock-jre8:2.25.1"
+    testImplementation "org.assertj:assertj-core:3.11.1"
+    testImplementation "javax.servlet:javax.servlet-api:4.0.1"
+}
